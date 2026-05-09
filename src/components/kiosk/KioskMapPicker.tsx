@@ -352,7 +352,7 @@ export default function KioskMapPicker({
                     key={p.place_id}
                     type="button"
                     onPointerDown={(e) => { e.preventDefault(); selectPrediction(p); }}
-                    style={{ width:"100%", display:"flex", alignItems:"center", gap:16, padding:"18px 20px", borderBottom:"1px solid #f3f4f6", background:"none", border:"none", borderBottom:"1px solid #f3f4f6", cursor:"pointer", textAlign:"left" }}
+                    style={{ width:"100%", display:"flex", alignItems:"center", gap:16, padding:"18px 20px", background:"none", border:"none", borderBottom:"1px solid #f3f4f6", cursor:"pointer", textAlign:"left" }}
                   >
                     <div style={{ width:44, height:44, borderRadius:"50%", background:"#dbeafe", display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0 }}>
                       <MapPin size={22} color="#2563eb" />
