@@ -324,15 +324,14 @@ export default function CreateBookingDialog({ onSuccess }: { onSuccess?: () => v
               </div>
               <div className="col-span-2">
                 <Label htmlFor="dropoffLocation" className="mb-2 block">
-                  Drop-off Location <span className="text-xs text-gray-500">(Destination)</span>
+                  Drop-off Location <span className="text-xs text-gray-500">(Click to select on map)</span>
                 </Label>
-                <div className="h-[300px] border rounded-lg overflow-hidden relative">
-                  <KioskMapPicker
-                    selectedLocation={formData.dropoffLocation}
-                    onSelect={(loc) => setFormData({ ...formData, dropoffLocation: loc })}
-                    onClear={() => setFormData({ ...formData, dropoffLocation: "" })}
-                  />
-                </div>
+                <KioskMapPicker
+                  value={formData.dropoffLocation}
+                  onChange={(loc) => setFormData({ ...formData, dropoffLocation: loc })}
+                  placeholder="Search destination on map..."
+                  showKeyboard={false}
+                />
               </div>
             </div>
             <div className="flex justify-end gap-3 pt-4">

@@ -19,8 +19,8 @@ import {
 import { bookingsApi } from "../lib/api";
 import { toast } from "sonner";
 import { usePickupLocations } from "../hooks/usePickupLocations";
-import GooglePlacesAutocomplete from "./GooglePlacesAutocomplete";
 import { VEHICLE_TYPES } from "../utils/constants";
+import KioskMapPicker from "./kiosk/KioskMapPicker";
 
 interface EditBookingDialogProps {
   booking: any;
@@ -265,16 +265,19 @@ export default function EditBookingDialog({
                 </SelectContent>
               </Select>
             </div>
-            <div className="col-span-2">
-              <Label htmlFor="edit-dropoffLocation">Drop-off Location</Label>
-              <GooglePlacesAutocomplete
-                value={formData.dropoffLocation}
-                onChange={(value) =>
-                  setFormData({ ...formData, dropoffLocation: value })
-                }
-                placeholder="Search for destination..."
-              />
-            </div>
+              <div className="col-span-2">
+                <Label htmlFor="edit-dropoffLocation" className="mb-2 block">
+                  Drop-off Location <span className="text-xs text-gray-500">(Click to select on map)</span>
+                </Label>
+                <KioskMapPicker
+                  value={formData.dropoffLocation}
+                  onChange={(value) =>
+                    setFormData({ ...formData, dropoffLocation: value })
+                  }
+                  placeholder="Search for destination..."
+                  showKeyboard={false}
+                />
+              </div>
           </div>
           <div className="flex justify-end gap-3 pt-4">
             <Button

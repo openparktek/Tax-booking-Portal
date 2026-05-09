@@ -14,6 +14,7 @@ interface KioskMapPickerProps {
   onChange: (value: string) => void;
   placeholder?: string;
   language?: string;
+  showKeyboard?: boolean;
 }
 
 // ── Mock fallback suggestions ──────────────────────────────────────────────────
@@ -69,6 +70,7 @@ export default function KioskMapPicker({
   value,
   onChange,
   placeholder = "Search destination...",
+  showKeyboard = true,
 }: KioskMapPickerProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -295,8 +297,9 @@ export default function KioskMapPicker({
               <input
                 type="text"
                 value={query}
-                readOnly
-                onPointerDown={() => setKbVisible(true)}
+                readOnly={showKeyboard}
+                onChange={(e) => !showKeyboard && handleQueryChange(e.target.value)}
+                onPointerDown={() => showKeyboard && setKbVisible(true)}
                 placeholder="Type a destination..."
                 style={{
                   width:"100%",
@@ -376,7 +379,7 @@ export default function KioskMapPicker({
           <div style={{
             flexShrink:0,
             padding:"12px 16px",
-            paddingBottom: kbVisible ? "340px" : "16px",
+            paddingBottom: (showKeyboard && kbVisible) ? "340px" : "16px",
             borderTop:"1px solid #e5e7eb",
             background:"#fff",
             transition:"padding-bottom 0.2s",
@@ -408,12 +411,14 @@ export default function KioskMapPicker({
           </div>
 
           {/* Virtual keyboard */}
-          <VirtualKeyboard
-            visible={kbVisible}
-            value={query}
-            onInput={handleQueryChange}
-            onDone={() => setKbVisible(false)}
-          />
+          {showKeyboard && (
+            <VirtualKeyboard
+              visible={kbVisible}
+              value={query}
+              onInput={handleQueryChange}
+              onDone={() => setKbVisible(false)}
+            />
+          )}
         </div>,
         document.body
       )}
