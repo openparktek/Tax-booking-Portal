@@ -1,0 +1,10 @@
+node_modules
+build
+dist
+.env
+.DS_Store
+*.log
+*.tar.gz
+package-lock.json
+server/node_modules
+server/dist

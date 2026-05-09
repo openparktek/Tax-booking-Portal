@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: openpark-booking-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: openpark_booking
+      POSTGRES_USER: openpark
+      POSTGRES_PASSWORD: openpark_dev_2026
+    ports:
+      - "5434:5432"
+    volumes:
+      - openpark_booking_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openpark -d openpark_booking"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: openpark-booking-app
+    restart: unless-stopped
+    ports:
+      - "3005:80"
+    environment:
+      DATABASE_URL: "postgresql://openpark:openpark_dev_2026@postgres:5432/openpark_booking"
+      JWT_SECRET: "openpark-booking-jwt-secret-change-in-production-2026"
+      PORT: "3002"
+      NODE_ENV: "production"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  openpark_booking_data:

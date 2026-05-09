@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* RTL Support */
+[dir="rtl"] {
+  direction: rtl;
+}
+
+[dir="ltr"] {
+  direction: ltr;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* RTL-specific adjustments */
+[dir="rtl"] .ltr\:text-right {
+  text-align: left;
+}
+
+[dir="rtl"] .ltr\:text-left {
+  text-align: right;
+}
+
+[dir="rtl"] .ltr\:ml-auto {
+  margin-right: auto;
+  margin-left: 0;
+}
+
+[dir="rtl"] .ltr\:mr-auto {
+  margin-left: auto;
+  margin-right: 0;
+}

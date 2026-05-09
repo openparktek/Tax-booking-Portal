@@ -1,0 +1,316 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────
+
+enum VehicleType {
+  SEDAN
+  LUXURY_SEDAN
+  SUV
+  LUXURY_SUV
+  VAN
+  MINIBUS
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  BUSY
+  MAINTENANCE
+  SUSPENDED
+}
+
+enum BookingStatus {
+  PENDING
+  PENDING_ASSIGNMENT
+  CONFIRMED_AT_AIRPORT
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TripStatus {
+  STARTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum SettlementStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  DISPUTED
+}
+
+enum AlertSeverity {
+  CRITICAL
+  MAJOR
+  MINOR
+  INFO
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+  SUSPENDED
+}
+
+// ─── Models ──────────────────────────────────────────────────
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String   @default("")
+  permissions String[] // Array of permission strings
+  isSystem    Boolean  @default(false) // System roles can't be deleted
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  roleId       String
+  companyId    String?
+  status       UserStatus @default(ACTIVE)
+  phone        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  role    Role     @relation(fields: [roleId], references: [id])
+  company Company? @relation(fields: [companyId], references: [id])
+
+  auditLogs  AuditLog[]
+  resolvedAlerts Alert[] @relation("AlertResolver")
+
+  @@map("users")
+}
+
+model Customer {
+  id           String     @id @default(cuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  mobile       String?
+  status       UserStatus @default(PENDING)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  bookings Booking[]
+
+  @@map("customers")
+}
+
+model Company {
+  id             String   @id @default(cuid())
+  name           String   @unique
+  contactEmail   String?
+  phone          String?
+  address        String?
+  status         String   @default("active")
+  commissionRate Float    @default(15.0) // percentage
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  users       User[]
+  drivers     Driver[]
+  vehicles    Vehicle[]
+  bookings    Booking[]
+  settlements Settlement[]
+
+  @@map("companies")
+}
+
+model Driver {
+  id            String    @id @default(cuid())
+  name          String
+  phone         String
+  email         String?
+  licenseNumber String?
+  licenseExpiry DateTime?
+  companyId     String?
+  status        String    @default("active")
+  rating        Float     @default(5.0)
+  totalTrips    Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  company  Company?  @relation(fields: [companyId], references: [id])
+  vehicles Vehicle[]
+  bookings Booking[]
+  trips    Trip[]
+
+  @@map("drivers")
+}
+
+model Vehicle {
+  id        String        @id @default(cuid())
+  plate     String        @unique
+  brand     String
+  model     String
+  year      Int?
+  color     String?
+  type      VehicleType   @default(SEDAN)
+  capacity  Int           @default(4)
+  status    VehicleStatus @default(AVAILABLE)
+  companyId String?
+  driverId  String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  company  Company?  @relation(fields: [companyId], references: [id])
+  driver   Driver?   @relation(fields: [driverId], references: [id])
+  bookings Booking[]
+  trips    Trip[]
+
+  @@map("vehicles")
+}
+
+model PickupLocation {
+  id        String   @id @default(cuid())
+  name      String
+  terminal  String
+  zone      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+
+  @@map("pickup_locations")
+}
+
+model Zone {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  baseFare    Float    @default(0)
+  perKmRate   Float    @default(0)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("zones")
+}
+
+model Booking {
+  id               String        @id // BK-{timestamp} format, generated in app
+  passenger        String
+  passengerPhone   String?
+  passengerEmail   String?
+  customerId       String?
+  companyId        String?
+  companyName      String?       // Denormalized for easy display
+  driverId         String?
+  driverName       String?       // Denormalized for easy display
+  vehicleId        String?
+  vehicleType      String?
+  pickupLocationId String?
+  pickupLocation   String?       // Text representation
+  dropoffLocation  String?
+  scheduledTime    DateTime?
+  pickupTime       String?       // Formatted time string
+  fare             Float         @default(0)
+  status           BookingStatus @default(PENDING)
+  flightNumber     String?
+  notes            String?
+  qrCode           String?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  customer       Customer?       @relation(fields: [customerId], references: [id])
+  company        Company?        @relation(fields: [companyId], references: [id], map: "booking_company_fk")
+  driver         Driver?         @relation(fields: [driverId], references: [id])
+  vehicle        Vehicle?        @relation(fields: [vehicleId], references: [id])
+  pickupLoc      PickupLocation? @relation(fields: [pickupLocationId], references: [id])
+  trips          Trip[]
+
+  @@map("bookings")
+}
+
+model Trip {
+  id            String     @id @default(cuid())
+  bookingId     String
+  driverId      String?
+  vehicleId     String?
+  startTime     DateTime?
+  endTime       DateTime?
+  status        TripStatus @default(STARTED)
+  startLocation String?
+  endLocation   String?
+  distance      Float?
+  actualFare    Float?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  booking Booking  @relation(fields: [bookingId], references: [id])
+  driver  Driver?  @relation(fields: [driverId], references: [id])
+  vehicle Vehicle? @relation(fields: [vehicleId], references: [id])
+
+  @@map("trips")
+}
+
+model Settlement {
+  id           String           @id @default(cuid())
+  companyId    String
+  periodStart  DateTime
+  periodEnd    DateTime
+  totalRevenue Float            @default(0)
+  totalTrips   Int              @default(0)
+  commission   Float            @default(0)
+  netAmount    Float            @default(0)
+  status       SettlementStatus @default(PENDING)
+  processedBy  String?
+  processedAt  DateTime?
+  notes        String?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id])
+
+  @@map("settlements")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String   // e.g., "CREATE", "UPDATE", "DELETE", "LOGIN"
+  entity    String   // e.g., "booking", "driver", "vehicle"
+  entityId  String?
+  details   Json?    // Additional context
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+}
+
+model Alert {
+  id         String        @id @default(cuid())
+  severity   AlertSeverity @default(INFO)
+  message    String
+  resolved   Boolean       @default(false)
+  resolvedBy String?
+  resolvedAt DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  resolver User? @relation("AlertResolver", fields: [resolvedBy], references: [id])
+
+  @@map("alerts")
+}
