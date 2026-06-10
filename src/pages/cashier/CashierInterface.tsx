@@ -41,10 +41,12 @@ import { bookingsApi } from "../../lib/api";
 import { toast } from "sonner";
 import { useCurrency } from "../../contexts/CurrencyContext";
 import { useNavigate } from "react-router";
+import { useUser } from "../../contexts/UserContext";
 
 export default function CashierInterface() {
   const navigate = useNavigate();
   const { formatCurrency } = useCurrency();
+  const { logout } = useUser();
   const [scanning, setScanning] = useState(false);
   const [manualBookingId, setManualBookingId] = useState("");
   const [currentBooking, setCurrentBooking] = useState<any>(null);
@@ -410,7 +412,8 @@ export default function CashierInterface() {
   // Handle logout
   const handleLogout = () => {
     if (confirm("Are you sure you want to logout from the cashier terminal?")) {
-      navigate("/login");
+      logout();
+      window.location.href = "/booking/login";
     }
   };
 

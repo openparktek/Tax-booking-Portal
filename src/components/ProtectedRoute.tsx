@@ -9,9 +9,9 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   useEffect(() => {
     const isKioskPath = window.location.pathname.includes('/kiosk');
     if (!loading && !isAuthenticated && !isKioskPath) {
-      navigate('/login', { replace: true });
+      window.location.href = "/booking/login";
     }
-  }, [isAuthenticated, loading, navigate]);
+  }, [isAuthenticated, loading]);
 
   // Show loading state while checking authentication
   if (loading) {

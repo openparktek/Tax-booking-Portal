@@ -28,7 +28,7 @@ async function apiCall(endpoint: string, options: RequestInit = {}) {
       localStorage.removeItem('openpark_current_user');
       const loginPath = '/booking/login';
       if (window.location.pathname !== loginPath && window.location.pathname !== '/login') {
-        window.location.href = loginPath;
+        window.location.href = window.location.origin + loginPath;
       }
       throw new Error('Session expired. Please login again.');
     }

@@ -104,10 +104,17 @@ export function UserProvider({ children }: { children: ReactNode }) {
           localStorage.removeItem('openpark_token');
           localStorage.removeItem('openpark_current_user');
         }
-      } catch (error) {
-        console.warn('Session restore failed, clearing auth state');
-        localStorage.removeItem('openpark_token');
-        localStorage.removeItem('openpark_current_user');
+      } catch (error: any) {
+        console.warn('Session restore failed:', error);
+        // Only clear token if the error is specifically indicating invalid credentials/expired session
+        const isAuthError = error.message?.includes('Session expired') || 
+                            error.message?.includes('Authentication required') || 
+                            error.message?.includes('Invalid or expired token') ||
+                            error.message?.includes('Not authenticated');
+        if (isAuthError) {
+          localStorage.removeItem('openpark_token');
+          localStorage.removeItem('openpark_current_user');
+        }
       } finally {
         setLoading(false);
       }

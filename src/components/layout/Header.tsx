@@ -23,7 +23,7 @@ export default function Header() {
   const handleLogout = () => {
     logout();
     toast.success("Logged out successfully");
-    navigate("/login");
+    window.location.href = "/booking/login";
   };
 
   return (

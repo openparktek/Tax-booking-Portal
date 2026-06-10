@@ -242,7 +242,7 @@ export default function KioskInterface() {
       // Password verified - logout successful
       logout();
       toast.success("Logged out successfully");
-      navigate("/login");
+      window.location.href = "/booking/login";
     } catch (error) {
       console.error("Error logging out:", error);
       toast.error("Failed to verify password");
