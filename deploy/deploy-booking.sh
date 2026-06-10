@@ -34,7 +34,7 @@ echo "🗄️ Setting up database..."
 ssh $SERVER "cd $REMOTE_DIR/server && npx prisma db push --accept-data-loss && npx tsx prisma/seed.ts"
 
 echo "🔄 Restarting backend service..."
-ssh $SERVER "pm2 restart openpark-booking 2>/dev/null || cd $REMOTE_DIR/server && pm2 start 'npx tsx src/index.ts' --name openpark-booking"
+ssh $SERVER "pm2 restart openpark-booking 2>/dev/null || (cd $REMOTE_DIR/server && pm2 start 'npx tsx src/index.ts' --name openpark-booking)"
 ssh $SERVER "pm2 save"
 
 echo "🔄 Reloading Nginx..."
