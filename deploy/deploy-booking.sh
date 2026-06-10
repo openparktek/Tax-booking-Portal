@@ -18,8 +18,7 @@ tar czf /tmp/openpark-booking-deploy.tar.gz \
   server/src/ \
   server/prisma/ \
   server/package.json \
-  server/tsconfig.json \
-  .env
+  server/tsconfig.json
 
 echo "🚀 Uploading to server..."
 ssh $SERVER "mkdir -p $REMOTE_DIR"
