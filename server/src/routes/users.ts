@@ -31,7 +31,7 @@ router.post('/', authenticateToken, async (req: AuthRequest, res: Response) => {
     if (!d.email || !d.password || !d.name || !d.roleId) { res.status(400).json({ success: false, error: 'Name, email, password, and role are required' }); return; }
     const passwordHash = await bcrypt.hash(d.password, 12);
     const user = await prisma.user.create({
-      data: { name: d.name, email: d.email.toLowerCase(), passwordHash, roleId: d.roleId, companyId: d.companyId || null, status: (d.status || 'ACTIVE') as any, phone: d.phone || null },
+      data: { name: d.name, email: d.email.toLowerCase(), passwordHash, roleId: d.roleId, companyId: d.companyId || null, status: ((d.status || 'ACTIVE').toUpperCase()) as any, phone: d.phone || null },
       select: { id: true, name: true, email: true, roleId: true, companyId: true, status: true },
     });
     res.status(201).json({ success: true, data: user });
@@ -49,7 +49,7 @@ router.put('/:id', authenticateToken, async (req: AuthRequest, res: Response) =>
     if (d.email) updateData.email = d.email.toLowerCase();
     if (d.roleId) updateData.roleId = d.roleId;
     if (d.companyId !== undefined) updateData.companyId = d.companyId || null;
-    if (d.status) updateData.status = d.status;
+    if (d.status) updateData.status = d.status.toUpperCase();
     if (d.phone !== undefined) updateData.phone = d.phone;
     if (d.password) updateData.passwordHash = await bcrypt.hash(d.password, 12);
     const user = await prisma.user.update({ where: { id: req.params.id }, data: updateData, select: { id: true, name: true, email: true, roleId: true, companyId: true, status: true } });

@@ -23,9 +23,9 @@ import { rolesApi, usersApi, companiesApi } from "../../lib/api";
 import { toast } from "sonner";
 
 const statusColors: Record<string, string> = {
-  active: "bg-green-100 text-green-700",
-  inactive: "bg-gray-100 text-gray-700",
-  suspended: "bg-red-100 text-red-700",
+  ACTIVE: "bg-green-100 text-green-700",
+  INACTIVE: "bg-gray-100 text-gray-700",
+  SUSPENDED: "bg-red-100 text-red-700",
 };
 
 export default function UserManagement() {
@@ -50,7 +50,7 @@ export default function UserManagement() {
     roleId: "",
     companyId: "",
     phone: "",
-    status: "active",
+    status: "ACTIVE",
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -98,7 +98,7 @@ export default function UserManagement() {
       roleId: "",
       companyId: "",
       phone: "",
-      status: "active",
+      status: "ACTIVE",
     });
     setEditDialogOpen(true);
   };
@@ -303,9 +303,9 @@ export default function UserManagement() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="suspended">Suspended</SelectItem>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="INACTIVE">Inactive</SelectItem>
+              <SelectItem value="SUSPENDED">Suspended</SelectItem>
             </SelectContent>
           </Select>
           <Button
@@ -570,9 +570,9 @@ export default function UserManagement() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="inactive">Inactive</SelectItem>
-                  <SelectItem value="suspended">Suspended</SelectItem>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="INACTIVE">Inactive</SelectItem>
+                  <SelectItem value="SUSPENDED">Suspended</SelectItem>
                 </SelectContent>
               </Select>
             </div>
